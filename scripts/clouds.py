@@ -3,7 +3,7 @@ import random
 
 
 class Cloud:
-    def __init__(self, pos, img: pygame.Surface, speed, depth):
+    def __init__(self, pos, img: pygame.Surface, speed: float, depth: float):
         self.pos = list(pos)
         self.img = img
         self.speed = speed
@@ -12,7 +12,7 @@ class Cloud:
     def update(self):
         self.pos[0] += self.speed
 
-    def render(self, surf: pygame.Surface, offset=(0.0, 0.0)):
+    def render(self, surf: pygame.Surface, offset=(0, 0)):
         render_pos = (
             self.pos[0] - offset[0] * self.depth,
             self.pos[1] - offset[1] * self.depth,
@@ -47,6 +47,6 @@ class Clouds:
         for cloud in self.clouds:
             cloud.update()
 
-    def render(self, surf: pygame.Surface, offset=(0.0, 0.0)):
+    def render(self, surf: pygame.Surface, offset=(0, 0)):
         for cloud in self.clouds:
             cloud.render(surf, offset)
