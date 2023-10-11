@@ -1,6 +1,6 @@
 from __future__ import annotations
-import pygame
 from typing import TYPE_CHECKING
+import pygame
 
 if TYPE_CHECKING:
     from game import Game
