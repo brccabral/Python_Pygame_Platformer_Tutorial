@@ -40,13 +40,19 @@ class Tilemap:
                 "pos": (10, 5 + i),
             }
 
-    def render(self, surf: pygame.Surface):
+    def render(self, surf: pygame.Surface, offset=(0, 0)):
         for tile in self.offgrid_tiles:
-            surf.blit(self.game.assets[tile["type"]][tile["variant"]], tile["pos"])
+            surf.blit(
+                self.game.assets[tile["type"]][tile["variant"]],
+                (tile["pos"][0] - offset[0], tile["pos"][1] - offset[1]),
+            )
         for loc, tile in self.tilemap.items():
             surf.blit(
                 self.game.assets[tile["type"]][tile["variant"]],
-                (tile["pos"][0] * self.tile_size, tile["pos"][1] * self.tile_size),
+                (
+                    tile["pos"][0] * self.tile_size - offset[0],
+                    tile["pos"][1] * self.tile_size - offset[1],
+                ),
             )
 
     def tiles_around(self, pos):

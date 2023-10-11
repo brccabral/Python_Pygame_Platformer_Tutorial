@@ -54,8 +54,11 @@ class PhysicsEntity:
         if self.collisions["down"] or self.collisions["up"]:
             self.velocity[1] = 0
 
-    def render(self, surf: pygame.Surface):
-        surf.blit(self.game.assets["player"], self.pos)
+    def render(self, surf: pygame.Surface, offset=(0, 0)):
+        surf.blit(
+            self.game.assets["player"],
+            (self.pos[0] - offset[0], self.pos[1] - offset[1]),
+        )
 
     def rect(self):
         return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
