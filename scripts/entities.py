@@ -14,8 +14,10 @@ class PhysicsEntity:
         self.pos = list(pos)  # make a copy, if not, will be reference
         self.size = list(size)  # make a copy, if not, will be reference
         self.velocity = [0.0, 0.0]
+        self.collisions = {"up": False, "down": False, "right": False, "left": False}
 
     def update(self, tilemap: Tilemap, movement=(0, 0)):
+        self.collisions = {"up": False, "down": False, "right": False, "left": False}
         frame_movement = (
             movement[0] + self.velocity[0],
             movement[1] + self.velocity[1],
@@ -27,8 +29,10 @@ class PhysicsEntity:
             if entity_rect.colliderect(rect):
                 if frame_movement[0] > 0:
                     entity_rect.right = rect.left
+                    self.collisions["right"] = True
                 if frame_movement[0] < 0:
                     entity_rect.left = rect.right
+                    self.collisions["left"] = True
                 # pygame Rect() only deals with Integers
                 self.pos[0] = entity_rect.x
 
@@ -39,12 +43,16 @@ class PhysicsEntity:
             if entity_rect.colliderect(rect):
                 if frame_movement[1] > 0:
                     entity_rect.bottom = rect.top
+                    self.collisions["down"] = True
                 if frame_movement[1] < 0:
                     entity_rect.top = rect.bottom
+                    self.collisions["up"] = True
                 # pygame Rect() only deals with Integers
                 self.pos[1] = entity_rect.y
 
         self.velocity[1] = min(5.0, self.velocity[1] + 0.1)
+        if self.collisions["down"] or self.collisions["up"]:
+            self.velocity[1] = 0
 
     def render(self, surf: pygame.Surface):
         surf.blit(self.game.assets["player"], self.pos)
