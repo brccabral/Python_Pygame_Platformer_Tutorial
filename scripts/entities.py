@@ -12,7 +12,7 @@ class PhysicsEntity:
         self.type = e_type
         self.pos = list(pos)  # make a copy, if not, will be reference
         self.size = list(size)  # make a copy, if not, will be reference
-        self.velocity = [0, 0]
+        self.velocity = [0.0, 0.0]
 
     def update(self, movement=(0, 0)):
         frame_movement = (
@@ -21,6 +21,8 @@ class PhysicsEntity:
         )
         self.pos[0] += frame_movement[0]
         self.pos[1] += frame_movement[1]
+
+        self.velocity[1] = min(5.0, self.velocity[1] + 0.1)
 
     def render(self, surf: pygame.Surface):
         surf.blit(self.game.assets["player"], self.pos)
