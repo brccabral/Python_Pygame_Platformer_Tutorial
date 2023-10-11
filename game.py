@@ -25,18 +25,19 @@ class Game:
             "grass": load_images("tiles/grass"),
             "large_decor": load_images("tiles/large_decor"),
             "stone": load_images("tiles/stone"),
+            "background": load_image("background.png"),
         }
         self.player = PhysicsEntity(self, "player", (50, 50), (8, 15))
 
         self.tilemap = Tilemap(self)
 
         # camera
-        self.scroll = [0, 0]
+        self.scroll = [0.0, 0.0]
 
     def run(self):
         while True:
             # clear screen
-            self.display.fill((14, 219, 248))
+            self.display.blit(self.assets["background"], (0, 0))
 
             # update camera to follow player with delay
             self.scroll[0] += (
