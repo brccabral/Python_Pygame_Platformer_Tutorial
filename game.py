@@ -39,6 +39,7 @@ class Game:
             # at the end of the animation loop, stop looping. Particles are marked for
             # deleting at the end of Animation
             "particle/leaf": Animation(load_images("particles/leaf"), 20, False),
+            "particle/particle": Animation(load_images("particles/particle"), 6, False),
         }
         self.player = Player(self, (50, 50), (8, 15))
 
@@ -56,6 +57,8 @@ class Game:
                 pygame.Rect(4 + tree["pos"][0], 4 + tree["pos"][1], 23, 13)
             )
         self.particles: list[Particle] = []
+
+        self.font = pygame.font.SysFont("comicsans", 30)
 
     def run(self):
         while True:
@@ -124,6 +127,8 @@ class Game:
                         self.movement[1] = True
                     if event.key == pygame.K_w:
                         self.player.jump()
+                    if event.key == pygame.K_l:
+                        self.player.dash()
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_a:
                         self.movement[0] = False
@@ -133,6 +138,10 @@ class Game:
             self.screen.blit(
                 pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
             )
+
+            # debug = self.font.render("Dash " + str(self.player.dashing), 1, "black")
+            # self.screen.blit(debug, (10, 10))
+
             pygame.display.update()
             self.clock.tick(60)
 
