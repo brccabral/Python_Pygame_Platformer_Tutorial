@@ -2,7 +2,6 @@ import sys
 import pygame
 
 from scripts.utils import load_images
-from scripts.tilemap import Tilemap
 
 RENDER_SCALE = 2.0
 
@@ -34,6 +33,10 @@ class Editor:
         # camera
         self.scroll = [0.0, 0.0]
 
+        self.clicking = False
+        self.right_clicking = False
+        self.shift = False
+
     def run(self):
         while True:
             # clear screen
@@ -51,6 +54,32 @@ class Editor:
                     pygame.quit()
                     sys.exit()
 
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        self.clicking = True
+                    if event.button == 3:
+                        self.right_clicking = True
+                    if self.shift:
+                        if event.button == 4:
+                            self.tile_variant = (self.tile_variant - 1) % len(
+                                self.assets[self.tile_list[self.tile_group]]
+                            )
+                        if event.button == 5:
+                            self.tile_variant = (self.tile_variant + 1) % len(
+                                self.assets[self.tile_list[self.tile_group]]
+                            )
+                    else:
+                        if event.button == 4:
+                            self.tile_group = (self.tile_group - 1) % len(
+                                self.tile_list
+                            )
+                            self.tile_variant = 0
+                        if event.button == 5:
+                            self.tile_group = (self.tile_group + 1) % len(
+                                self.tile_list
+                            )
+                            self.tile_variant = 0
+
                 # keyboard events
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_a:
@@ -61,6 +90,8 @@ class Editor:
                         self.movement[2] = True
                     if event.key == pygame.K_s:
                         self.movement[3] = True
+                    if event.key == pygame.K_LSHIFT:
+                        self.shift = True
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_a:
                         self.movement[0] = False
@@ -70,6 +101,8 @@ class Editor:
                         self.movement[2] = False
                     if event.key == pygame.K_s:
                         self.movement[3] = False
+                    if event.key == pygame.K_LSHIFT:
+                        self.shift = False
 
             self.screen.blit(
                 pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
