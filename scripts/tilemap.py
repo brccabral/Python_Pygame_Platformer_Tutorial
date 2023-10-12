@@ -4,6 +4,7 @@ import pygame
 
 if TYPE_CHECKING:
     from game import Game
+    from editor import Editor
 
 NEIGHBOR_OFFSETS = [
     (-1, 0),
@@ -20,7 +21,7 @@ PHYSICS_TILES = {"grass", "stone"}
 
 
 class Tilemap:
-    def __init__(self, game: Game, tile_size=16):
+    def __init__(self, game: Game | Editor, tile_size=16):
         self.tile_size = tile_size
         self.game = game
         self.tilemap = {}
