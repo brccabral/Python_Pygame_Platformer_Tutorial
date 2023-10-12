@@ -136,3 +136,31 @@ class Tilemap:
             neighbors = tuple(sorted(neighbors))
             if neighbors in AUTOTILE_MAP:
                 tile["variant"] = AUTOTILE_MAP[neighbors]
+
+    def extract(self, id_pairs, keep=False):
+        """
+        Returns a list of tiles that matches the requested list of id_pairs.
+        Queries the map in search of given ids
+        :param id_pairs: list of ("type", "variant")
+        :param keep: delete from map or not
+        :return: list of tiles matched all kinds of id_pairs
+        """
+        matches = []
+        for tile in self.offgrid_tiles.copy():
+            if (tile["type"], tile["variant"]) in id_pairs:
+                matches.append(tile.copy())
+                if not keep:
+                    # this is safe because we loop in a copy
+                    self.offgrid_tiles.remove(tile)
+        for loc, tile in self.tilemap.items():
+            if (tile["type"], tile["variant"]) in id_pairs:
+                matches.append(tile.copy())
+                matches[-1]["pos"] = matches[-1]["pos"].copy()
+                # convert to pixels dimension
+                # we can change this value because it is a copy
+                # if not, we would be changing the one on display at the moment
+                matches[-1]["pos"][0] *= self.tile_size
+                matches[-1]["pos"][1] *= self.tile_size
+                if not keep:
+                    del self.tilemap[loc]
+        return matches

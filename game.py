@@ -44,6 +44,8 @@ class Game:
 
         self.clouds = Clouds(self.assets["clouds"], 16)
 
+        print(self.tilemap.extract([("large_decor", 2)], keep=True))
+
     def run(self):
         while True:
             # clear screen
