@@ -40,6 +40,8 @@ class Editor:
 
         self.tilemap = Tilemap(self, 16)
 
+        self.ongrid = True
+
     def run(self):
         while True:
             # clear screen
@@ -64,25 +66,49 @@ class Editor:
                 int(mpos[1] + self.scroll[1]) // self.tilemap.tile_size,
             )
 
-            self.display.blit(
-                current_tile_img,
-                (
-                    tile_pos[0] * self.tilemap.tile_size - self.scroll[0],
-                    tile_pos[1] * self.tilemap.tile_size - self.scroll[1],
-                ),
-            )
+            # show current tile ongrid
+            if self.ongrid:
+                self.display.blit(
+                    current_tile_img,
+                    (
+                        tile_pos[0] * self.tilemap.tile_size - self.scroll[0],
+                        tile_pos[1] * self.tilemap.tile_size - self.scroll[1],
+                    ),
+                )
+            # show current tile offgrid
+            else:
+                self.display.blit(
+                    current_tile_img,
+                    mpos,
+                )
 
-            if self.clicking:
+            # place current selected tile ongrid
+            if self.clicking and self.ongrid:
                 self.tilemap.tilemap[str(tile_pos[0]) + ";" + str(tile_pos[1])] = {
                     "type": self.tile_list[self.tile_group],
                     "variant": self.tile_variant,
                     "pos": tile_pos,
                 }
+            # delete tiles
             if self.right_clicking:
                 tile_loc = str(tile_pos[0]) + ";" + str(tile_pos[1])
                 if tile_loc in self.tilemap.tilemap:
                     del self.tilemap.tilemap[tile_loc]
+                # delete tiles offgrid (not worried about performance)
+                for tile in self.tilemap.offgrid_tiles.copy():
+                    tile_img: pygame.Surface = self.assets[tile["type"]][
+                        tile["variant"]
+                    ]
+                    tile_rect = pygame.Rect(
+                        tile["pos"][0] - self.scroll[0],
+                        tile["pos"][1] - self.scroll[1],
+                        tile_img.get_width(),
+                        tile_img.get_height(),
+                    )
+                    if tile_rect.collidepoint(mpos):
+                        self.tilemap.offgrid_tiles.remove(tile)
 
+            # show current select tile on top left
             self.display.blit(current_tile_img, (5, 5))
 
             for event in pygame.event.get():
@@ -93,6 +119,18 @@ class Editor:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         self.clicking = True
+                        # place tiles offgrid
+                        if not self.ongrid:
+                            self.tilemap.offgrid_tiles.append(
+                                {
+                                    "type": self.tile_list[self.tile_group],
+                                    "variant": self.tile_variant,
+                                    "pos": (
+                                        mpos[0] + self.scroll[0],
+                                        mpos[1] + self.scroll[1],
+                                    ),
+                                }
+                            )
                     if event.button == 3:
                         self.right_clicking = True
                     if self.shift:
@@ -134,6 +172,8 @@ class Editor:
                         self.movement[3] = True
                     if event.key == pygame.K_LSHIFT:
                         self.shift = True
+                    if event.key == pygame.K_g:
+                        self.ongrid = not self.ongrid
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_a:
                         self.movement[0] = False
