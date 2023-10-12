@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import pygame
+import json
 
 if TYPE_CHECKING:
     from game import Game
@@ -81,3 +82,21 @@ class Tilemap:
                     )
                 )
         return rects
+
+    def save(self, path):
+        with open(path, "w") as f:
+            json.dump(
+                {
+                    "tilemap": self.tilemap,
+                    "tile_size": self.tile_size,
+                    "offgrid_tiles": self.offgrid_tiles,
+                },
+                f,
+            )
+
+    def load(self, path):
+        with open(path, "r") as f:
+            map_data = json.load(f)
+        self.tilemap = map_data["tilemap"]
+        self.tile_size = map_data["tile_size"]
+        self.offgrid_tiles = map_data["offgrid_tiles"]

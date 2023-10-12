@@ -37,8 +37,13 @@ class Editor:
         self.clicking = False
         self.right_clicking = False
         self.shift = False
+        self.ctrl = False
 
         self.tilemap = Tilemap(self, 16)
+        try:
+            self.tilemap.load("map.json")
+        except FileNotFoundError:
+            pass
 
         self.ongrid = True
 
@@ -168,10 +173,14 @@ class Editor:
                         self.movement[1] = True
                     if event.key == pygame.K_w:
                         self.movement[2] = True
-                    if event.key == pygame.K_s:
+                    if event.key == pygame.K_s and not self.ctrl:
                         self.movement[3] = True
+                    if event.key == pygame.K_s and self.ctrl:
+                        self.tilemap.save("map.json")
                     if event.key == pygame.K_LSHIFT:
                         self.shift = True
+                    if event.key == pygame.K_LCTRL:
+                        self.ctrl = True
                     if event.key == pygame.K_g:
                         self.ongrid = not self.ongrid
                 if event.type == pygame.KEYUP:
@@ -185,6 +194,8 @@ class Editor:
                         self.movement[3] = False
                     if event.key == pygame.K_LSHIFT:
                         self.shift = False
+                    if event.key == pygame.K_LCTRL:
+                        self.ctrl = False
 
             self.screen.blit(
                 pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
