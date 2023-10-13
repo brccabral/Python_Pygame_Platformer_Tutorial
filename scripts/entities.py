@@ -209,3 +209,18 @@ class Player(PhysicsEntity):
     def render(self, surf: pygame.Surface, offset=(0, 0)):
         if abs(self.dashing) <= 50:
             super().render(surf, offset)
+
+
+class Enemy(PhysicsEntity):
+    def __init__(self, game: Game, pos, size):
+        super().__init__(game, "enemy", pos, size)
+
+        self.walking = 0
+
+    def update(self, tilemap: Tilemap, movement=(0, 0)):
+        if self.walking:
+            movement = (movement[0] - 0.5 if self.flip else 0.5, movement[1])
+            self.walking = max(0, self.walking - 1)
+        elif random.random() < 0.01:
+            self.walking = random.randint(30, 120)
+        super().update(tilemap, movement)

@@ -3,7 +3,7 @@ import pygame
 import random
 import math
 
-from scripts.entities import Player
+from scripts.entities import Player, Enemy
 from scripts.utils import load_image, load_images, Animation
 from scripts.tilemap import Tilemap
 from scripts.clouds import Clouds
@@ -36,6 +36,8 @@ class Game:
             "player/run": Animation(load_images("entities/player/run"), 4),
             "player/slide": Animation(load_images("entities/player/slide")),
             "player/wall_slide": Animation(load_images("entities/player/wall_slide")),
+            "enemy/idle": Animation(load_images("entities/enemy/idle"), 6),
+            "enemy/run": Animation(load_images("entities/enemy/run"), 4),
             # at the end of the animation loop, stop looping. Particles are marked for
             # deleting at the end of Animation
             "particle/leaf": Animation(load_images("particles/leaf"), 20, False),
@@ -56,6 +58,14 @@ class Game:
             self.leaf_spawners.append(
                 pygame.Rect(4 + tree["pos"][0], 4 + tree["pos"][1], 23, 13)
             )
+
+        self.enemies = []
+        for spawner in self.tilemap.extract([("spawners", 0), ("spawners", 1)]):
+            if spawner["variant"] == 0:
+                self.player.pos = spawner["pos"]
+            else:
+                self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
+
         self.particles: list[Particle] = []
 
         self.font = pygame.font.SysFont("comicsans", 30)
@@ -102,6 +112,10 @@ class Game:
             self.clouds.render(self.display, render_scroll)
 
             self.tilemap.render(self.display, offset=render_scroll)
+
+            for enemy in self.enemies.copy():
+                enemy.update(self.tilemap, (0, 0))
+                enemy.render(self.display, render_scroll)
 
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=render_scroll)
