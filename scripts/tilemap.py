@@ -104,7 +104,7 @@ class Tilemap:
                 {
                     "tilemap": self.tilemap,
                     "tile_size": self.tile_size,
-                    "offgrid_tiles": self.offgrid_tiles,
+                    "offgrid": self.offgrid_tiles,
                 },
                 f,
             )
@@ -114,7 +114,7 @@ class Tilemap:
             map_data = json.load(f)
         self.tilemap = map_data["tilemap"]
         self.tile_size = map_data["tile_size"]
-        self.offgrid_tiles = map_data["offgrid_tiles"]
+        self.offgrid_tiles = map_data["offgrid"]
 
     # check if a neighbor exists and choose the correct variant
     # that better fits the location

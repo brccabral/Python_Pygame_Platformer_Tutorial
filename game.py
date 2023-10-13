@@ -48,29 +48,19 @@ class Game:
         self.player = Player(self, (50, 50), (8, 15))
 
         self.tilemap = Tilemap(self)
-        self.tilemap.load("map.json")
 
         # camera
         self.scroll = [0.0, 0.0]
 
-        self.clouds = Clouds(self.assets["clouds"], 16)
+        self.clouds = Clouds(self.assets["clouds"], 1)
 
         self.leaf_spawners = []
-        for tree in self.tilemap.extract([("large_decor", 2)], keep=True):
-            self.leaf_spawners.append(
-                pygame.Rect(4 + tree["pos"][0], 4 + tree["pos"][1], 23, 13)
-            )
-
         self.enemies = []
-        for spawner in self.tilemap.extract([("spawners", 0), ("spawners", 1)]):
-            if spawner["variant"] == 0:
-                self.player.pos = spawner["pos"]
-            else:
-                self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
-
         self.particles: list[Particle] = []
         # [[x, y], direction, timer]
         self.projectiles: list[[int, int], float, int] = []
+
+        self.load_level(0)
 
         self.font = pygame.font.SysFont("comicsans", 30)
 
@@ -182,6 +172,31 @@ class Game:
 
             pygame.display.update()
             self.clock.tick(60)
+
+    def load_level(self, map_id):
+        self.tilemap.load("data/maps/" + str(map_id) + ".json")
+
+        self.leaf_spawners = []
+        for tree in self.tilemap.extract([("large_decor", 2)], keep=True):
+            self.leaf_spawners.append(
+                pygame.Rect(4 + tree["pos"][0], 4 + tree["pos"][1], 23, 13)
+            )
+
+        self.enemies = []
+        for spawner in self.tilemap.extract([("spawners", 0), ("spawners", 1)]):
+            if spawner["variant"] == 0:
+                self.player.pos = spawner["pos"]
+            else:
+                self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
+
+        self.particles: list[Particle] = []
+        # [[x, y], direction, timer]
+        self.projectiles: list[[int, int], float, int] = []
+
+        # camera
+        self.scroll = [0.0, 0.0]
+
+        self.clouds = Clouds(self.assets["clouds"], 16)
 
 
 Game().run()
