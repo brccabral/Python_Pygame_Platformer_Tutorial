@@ -30,6 +30,7 @@ class Game:
             "large_decor": load_images("tiles/large_decor"),
             "stone": load_images("tiles/stone"),
             "background": load_image("background.png"),
+            "gun": load_image("gun.png"),
             "clouds": load_images("clouds"),
             "player/idle": Animation(load_images("entities/player/idle"), 6),
             "player/jump": Animation(load_images("entities/player/jump")),
