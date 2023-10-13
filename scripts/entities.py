@@ -208,6 +208,7 @@ class Player(PhysicsEntity):
 
     def dash(self):
         if not self.dashing:
+            self.game.sfx["dash"].play()
             if self.flip:
                 self.dashing = -60
             else:
@@ -246,6 +247,7 @@ class Enemy(PhysicsEntity):
                 if abs(dis[1]) < 16:
                     # enemy looking left and player is on the left
                     if self.flip and dis[0] < 0:
+                        self.game.sfx["shoot"].play()
                         self.game.projectiles.append(
                             [(self.rect().centerx - 7, self.rect().centery), -1.5, 0]
                         )
@@ -259,6 +261,7 @@ class Enemy(PhysicsEntity):
                             )
                     # enemy looking right and player is on the right
                     if not self.flip and dis[0] > 0:
+                        self.game.sfx["shoot"].play()
                         self.game.projectiles.append(
                             [(self.rect().centerx + 7, self.rect().centery), 1.5, 0]
                         )
@@ -283,6 +286,7 @@ class Enemy(PhysicsEntity):
         if abs(self.game.player.dashing) >= 50:
             if self.rect().colliderect(self.game.player.rect()):
                 self.game.screenshake = max(16, self.game.screenshake)
+                self.game.sfx["hit"].play()
                 for i in range(30):
                     angle = random.random() * math.pi * 2
                     speed = random.random() * 5
