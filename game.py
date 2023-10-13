@@ -49,6 +49,7 @@ class Game:
             "particle/particle": Animation(load_images("particles/particle"), 6, False),
         }
         self.player = Player(self, (50, 50), (8, 15))
+        self.dead = 0
 
         self.tilemap = Tilemap(self)
 
@@ -72,6 +73,12 @@ class Game:
         while True:
             # clear screen
             self.display.blit(self.assets["background"], (0, 0))
+
+            # gives 40 frames to player disapear before reload level
+            if self.dead:
+                self.dead += 1
+                if self.dead > 40:
+                    self.load_level(0)
 
             # update camera to follow player with delay
             self.scroll[0] += (
@@ -117,8 +124,11 @@ class Game:
                 if kill:
                     self.enemies.remove(enemy)
 
-            self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
-            self.player.render(self.display, offset=render_scroll)
+            if not self.dead:
+                self.player.update(
+                    self.tilemap, (self.movement[1] - self.movement[0], 0)
+                )
+                self.player.render(self.display, offset=render_scroll)
 
             # [[x, y], direction, timer]
             for projectile in self.projectiles:
@@ -153,6 +163,7 @@ class Game:
                 elif abs(self.player.dashing) < 50:
                     if self.player.rect().collidepoint(projectile[0]):
                         self.projectiles.remove(projectile)
+                        self.dead += 1
                         for i in range(30):
                             angle = random.random() * math.pi * 2
                             speed = random.random() * 5
@@ -223,6 +234,8 @@ class Game:
 
     def load_level(self, map_id):
         self.tilemap.load("data/maps/" + str(map_id) + ".json")
+
+        self.dead = 0
 
         self.leaf_spawners = []
         for tree in self.tilemap.extract([("large_decor", 2)], keep=True):
