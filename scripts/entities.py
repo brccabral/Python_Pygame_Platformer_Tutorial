@@ -110,6 +110,7 @@ class Player(PhysicsEntity):
         # when player falls off a cliff
         if self.air_time > 180:
             self.game.dead += 1
+            self.game.screenshake = max(16, self.game.screenshake)
 
         if self.collisions["down"]:
             self.air_time = 0
@@ -281,6 +282,7 @@ class Enemy(PhysicsEntity):
         # player hits enemy with a dash
         if abs(self.game.player.dashing) >= 50:
             if self.rect().colliderect(self.game.player.rect()):
+                self.game.screenshake = max(16, self.game.screenshake)
                 for i in range(30):
                     angle = random.random() * math.pi * 2
                     speed = random.random() * 5

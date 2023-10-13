@@ -55,6 +55,7 @@ class Game:
 
         # camera
         self.scroll = [0.0, 0.0]
+        self.screenshake = 0
 
         self.clouds = Clouds(self.assets["clouds"], 1)
 
@@ -73,6 +74,8 @@ class Game:
         while True:
             # clear screen
             self.display.blit(self.assets["background"], (0, 0))
+
+            self.screenshake = max(0, self.screenshake - 1)
 
             # gives 40 frames to player disapear before reload level
             if self.dead:
@@ -164,6 +167,7 @@ class Game:
                     if self.player.rect().collidepoint(projectile[0]):
                         self.projectiles.remove(projectile)
                         self.dead += 1
+                        self.screenshake = max(16, self.screenshake)
                         for i in range(30):
                             angle = random.random() * math.pi * 2
                             speed = random.random() * 5
@@ -222,8 +226,13 @@ class Game:
                     if event.key == pygame.K_d:
                         self.movement[1] = False
 
+            screenshake_offset = (
+                random.random() * self.screenshake - self.screenshake / 2,
+                random.random() * self.screenshake - self.screenshake / 2,
+            )
             self.screen.blit(
-                pygame.transform.scale(self.display, self.screen.get_size()), (0, 0)
+                pygame.transform.scale(self.display, self.screen.get_size()),
+                screenshake_offset,
             )
 
             # debug = self.font.render("Dash " + str(self.player.dashing), 1, "black")
