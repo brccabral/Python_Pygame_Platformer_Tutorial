@@ -66,7 +66,11 @@ class Game:
         # [[x, y], direction, timer]
         self.projectiles: list[list[Union[tuple[float, float], float]]] = []
 
-        self.load_level(0)
+        self.level = 0
+        # transition < 0 - black to clear
+        # transition > 0 - clear to black
+        self.transition = 0
+        self.load_level(self.level)
 
         self.font = pygame.font.SysFont("comicsans", 30)
 
@@ -77,11 +81,22 @@ class Game:
 
             self.screenshake = max(0, self.screenshake - 1)
 
+            if not len(self.enemies):
+                self.transition += 1
+                # load new level when it is complete black
+                if self.transition > 30:
+                    self.level += 1
+                    self.load_level(self.level)
+            if self.transition < 0:
+                self.transition += 1
+
             # gives 40 frames to player disapear before reload level
             if self.dead:
                 self.dead += 1
+                if self.dead >= 10:
+                    self.transition = min(self.transition + 1, 30)
                 if self.dead > 40:
-                    self.load_level(0)
+                    self.load_level(self.level)
 
             # update camera to follow player with delay
             self.scroll[0] += (
@@ -226,6 +241,17 @@ class Game:
                     if event.key == pygame.K_d:
                         self.movement[1] = False
 
+            if self.transition:
+                transition_surf = pygame.Surface(self.display.get_size())
+                pygame.draw.circle(
+                    transition_surf,
+                    "white",
+                    self.display.get_rect().center,
+                    (30 - abs(self.transition)) * 8,
+                )
+                transition_surf.set_colorkey("white")
+                self.display.blit(transition_surf, (0, 0))
+
             screenshake_offset = (
                 random.random() * self.screenshake - self.screenshake / 2,
                 random.random() * self.screenshake - self.screenshake / 2,
@@ -257,6 +283,8 @@ class Game:
             if spawner["variant"] == 0:
                 self.player.pos = spawner["pos"]
                 self.player.air_time = 0
+                self.player.velocity = [0.0, 0.0]
+                self.player.flip = False
             else:
                 self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
 
@@ -268,6 +296,8 @@ class Game:
         self.scroll = [0.0, 0.0]
 
         self.clouds = Clouds(self.assets["clouds"], 16)
+
+        self.transition = -30
 
 
 Game().run()
