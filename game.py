@@ -31,6 +31,7 @@ class Game:
             "stone": load_images("tiles/stone"),
             "background": load_image("background.png"),
             "gun": load_image("gun.png"),
+            "projectile": load_image("projectile.png"),
             "clouds": load_images("clouds"),
             "player/idle": Animation(load_images("entities/player/idle"), 6),
             "player/jump": Animation(load_images("entities/player/jump")),
@@ -68,6 +69,8 @@ class Game:
                 self.enemies.append(Enemy(self, spawner["pos"], (8, 15)))
 
         self.particles: list[Particle] = []
+        # [[x, y], direction, timer]
+        self.projectiles: list[[int, int], float, int] = []
 
         self.font = pygame.font.SysFont("comicsans", 30)
 
@@ -120,6 +123,26 @@ class Game:
 
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=render_scroll)
+
+            # [[x, y], direction, timer]
+            for projectile in self.projectiles:
+                projectile[0][0] += projectile[1]
+                projectile[2] += 1
+                img = self.assets["projectile"]
+                self.display.blit(
+                    img,
+                    (
+                        projectile[0][0] - img.get_width() / 2 - render_scroll[0],
+                        projectile[0][1] - img.get_height() / 2 - render_scroll[1],
+                    ),
+                )
+                if self.tilemap.solid_check(projectile[0]):
+                    self.projectiles.remove(projectile)
+                elif projectile[2] > 360:
+                    self.projectiles.remove(projectile)
+                elif abs(self.player.dashing) < 50:
+                    if self.player.rect().collidepoint(projectile[0]):
+                        self.projectiles.remove(projectile)
 
             for particle in self.particles.copy():
                 particle.render(self.display, render_scroll)
