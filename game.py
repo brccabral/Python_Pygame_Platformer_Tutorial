@@ -1,3 +1,4 @@
+import os
 import sys
 import pygame
 import random
@@ -85,7 +86,7 @@ class Game:
                 self.transition += 1
                 # load new level when it is complete black
                 if self.transition > 30:
-                    self.level += 1
+                    self.level = (self.level + 1) % len(os.listdir("data/maps"))
                     self.load_level(self.level)
             if self.transition < 0:
                 self.transition += 1
