@@ -1,10 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import pygame
+import math
+import random
+
 
 if TYPE_CHECKING:
     from game import Game
     from scripts.tilemap import Tilemap
+
+from scripts.particle import Particle
 
 
 class PhysicsEntity:
@@ -124,6 +129,22 @@ class Player(PhysicsEntity):
             else:
                 self.set_action("idle")
 
+        # burst of particles at begining and end of dash
+        if abs(self.dashing) in {60, 50}:
+            for i in range(20):
+                angle = random.random() * math.pi * 2
+                speed = random.random() * 0.5 + 0.5
+                pvelocity = [math.cos(angle) * speed, math.sin(angle) * speed]
+                self.game.particles.append(
+                    Particle(
+                        self.game,
+                        "particle",
+                        self.rect().center,
+                        pvelocity,
+                        random.randint(0, 7),
+                    )
+                )
+
         if self.dashing > 0:
             self.dashing = max(0, self.dashing - 1)
         elif self.dashing < 0:
@@ -137,6 +158,17 @@ class Player(PhysicsEntity):
             self.velocity[0] = abs(self.dashing) / self.dashing * 8
             if abs(self.dashing) == 51:
                 self.velocity[0] *= 0.1
+            # stream of particles from begin to end of dash
+            pvelocity = [abs(self.dashing) / self.dashing * random.random() * 3, 0]
+            self.game.particles.append(
+                Particle(
+                    self.game,
+                    "particle",
+                    self.rect().center,
+                    pvelocity,
+                    random.randint(0, 7),
+                )
+            )
 
         if self.velocity[0] > 0:
             self.velocity[0] = max(self.velocity[0] - 0.1, 0)
@@ -173,3 +205,7 @@ class Player(PhysicsEntity):
                 self.dashing = -60
             else:
                 self.dashing = 60
+
+    def render(self, surf: pygame.Surface, offset=(0, 0)):
+        if abs(self.dashing) <= 50:
+            super().render(surf, offset)
