@@ -241,7 +241,7 @@ class Enemy(PhysicsEntity):
                     # enemy looking left and player is on the left
                     if self.flip and dis[0] < 0:
                         self.game.projectiles.append(
-                            [[self.rect().centerx - 7, self.rect().centery], -1.5, 0]
+                            [(self.rect().centerx - 7, self.rect().centery), -1.5, 0]
                         )
                         for i in range(4):
                             self.game.sparks.append(
@@ -254,7 +254,7 @@ class Enemy(PhysicsEntity):
                     # enemy looking right and player is on the right
                     if not self.flip and dis[0] > 0:
                         self.game.projectiles.append(
-                            [[self.rect().centerx + 7, self.rect().centery], 1.5, 0]
+                            [(self.rect().centerx + 7, self.rect().centery), 1.5, 0]
                         )
                         for i in range(4):
                             self.game.sparks.append(
@@ -272,6 +272,42 @@ class Enemy(PhysicsEntity):
             self.set_action("run")
         else:
             self.set_action("idle")
+
+        # player hits enemy with a dash
+        if abs(self.game.player.dashing) >= 50:
+            if self.rect().colliderect(self.game.player.rect()):
+                for i in range(30):
+                    angle = random.random() * math.pi * 2
+                    speed = random.random() * 5
+                    self.game.sparks.append(
+                        Spark(
+                            self.rect().center,
+                            angle,
+                            speed,
+                        )
+                    )
+                    self.game.particles.append(
+                        Particle(
+                            self.game,
+                            "particle",
+                            self.rect().center,
+                            velocity=[
+                                math.cos(angle + math.pi) * speed * 0.5,
+                                math.sin(angle + math.pi) * speed * 0.5,
+                            ],
+                            frame=random.randint(0, 7),
+                        )
+                    )
+                # big sparks
+                self.game.sparks.append(
+                    Spark(self.rect().center, 0, 5 + random.random())
+                )
+                self.game.sparks.append(
+                    Spark(self.rect().center, math.pi, 5 + random.random())
+                )
+                return True
+
+        return False
 
     def render(self, surf: pygame.Surface, offset=(0, 0)):
         super().render(surf, offset)
