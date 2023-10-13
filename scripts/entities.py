@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from scripts.tilemap import Tilemap
 
 from scripts.particle import Particle
+from scripts.spark import Spark
 
 
 class PhysicsEntity:
@@ -242,11 +243,27 @@ class Enemy(PhysicsEntity):
                         self.game.projectiles.append(
                             [[self.rect().centerx - 7, self.rect().centery], -1.5, 0]
                         )
+                        for i in range(4):
+                            self.game.sparks.append(
+                                Spark(
+                                    self.game.projectiles[-1][0],
+                                    random.random() - 0.5 + math.pi,
+                                    2 + random.random(),
+                                )
+                            )
                     # enemy looking right and player is on the right
                     if not self.flip and dis[0] > 0:
                         self.game.projectiles.append(
                             [[self.rect().centerx + 7, self.rect().centery], 1.5, 0]
                         )
+                        for i in range(4):
+                            self.game.sparks.append(
+                                Spark(
+                                    self.game.projectiles[-1][0],
+                                    random.random() - 0.5,
+                                    2 + random.random(),
+                                )
+                            )
         elif random.random() < 0.01:
             self.walking = random.randint(30, 120)
         super().update(tilemap, movement)
